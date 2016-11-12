@@ -313,7 +313,17 @@ app.post('/api/rate', function(req, res) {
     else {
         res.json({ success: false, message: "You need to be logged in as a customer"});
     }
-})
+});
+
+
+// gets the user rating for certain users
+app.get('/api/rating/:username', function(req, res) {
+    User.findOne({name: req.params.username}, function(err, user) {
+        if (err) throw err;
+
+        res.json({ success: true, rating: user.rating/user.total});
+    })
+});
 
 // make the server start and listen
 server.listen(process.env.PORT || 3000, function () {
