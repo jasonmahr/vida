@@ -278,10 +278,9 @@ app.post('/api/rate', function(req, res) {
                         // TODO also update mongo for both user and club
                     }
                 }
-            })
-        }
+            }
+        })
 
-      });
     }
     else {
         res.json({ success: false, message: "You need to be logged in as a business"});
