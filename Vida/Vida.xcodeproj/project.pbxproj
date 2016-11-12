@@ -14,6 +14,7 @@
 		2668416F1DD779ED00585B84 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2668416D1DD779ED00585B84 /* LaunchScreen.storyboard */; };
 		2668417A1DD779ED00585B84 /* VidaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266841791DD779ED00585B84 /* VidaTests.swift */; };
 		266841851DD779ED00585B84 /* VidaUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266841841DD779ED00585B84 /* VidaUITests.swift */; };
+		266841931DD79CBC00585B84 /* CustomClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266841921DD79CBC00585B84 /* CustomClass.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		266841801DD779ED00585B84 /* VidaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VidaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		266841841DD779ED00585B84 /* VidaUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VidaUITests.swift; sourceTree = "<group>"; };
 		266841861DD779EE00585B84 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		266841921DD79CBC00585B84 /* CustomClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomClass.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +105,7 @@
 				2668416B1DD779ED00585B84 /* Assets.xcassets */,
 				2668416D1DD779ED00585B84 /* LaunchScreen.storyboard */,
 				266841701DD779ED00585B84 /* Info.plist */,
+				266841921DD79CBC00585B84 /* CustomClass.swift */,
 			);
 			path = Vida;
 			sourceTree = "<group>";
@@ -259,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				266841931DD79CBC00585B84 /* CustomClass.swift in Sources */,
 				266841671DD779ED00585B84 /* ViewController.swift in Sources */,
 				266841651DD779ED00585B84 /* AppDelegate.swift in Sources */,
 			);
@@ -505,6 +509,7 @@
 				2668418B1DD779EE00585B84 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2668418C1DD779EE00585B84 /* Build configuration list for PBXNativeTarget "VidaTests" */ = {
 			isa = XCConfigurationList;
@@ -513,6 +518,7 @@
 				2668418E1DD779EE00585B84 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2668418F1DD779EE00585B84 /* Build configuration list for PBXNativeTarget "VidaUITests" */ = {
 			isa = XCConfigurationList;
@@ -521,6 +527,7 @@
 				266841911DD779EE00585B84 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
