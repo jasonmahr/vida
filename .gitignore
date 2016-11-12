@@ -1,0 +1,4 @@
+node_modules/
+admin_key.json
+.DS_Store
+npm-debug.log

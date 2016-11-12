@@ -1,0 +1,26 @@
+{
+  "name": "vida",
+  "version": "1.0.0",
+  "description": "Live the life",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasonmahr/vida.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jasonmahr/vida/issues"
+  },
+  "homepage": "https://github.com/jasonmahr/vida#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "firebase": "^3.6.0",
+    "firebase-admin": "^4.0.1",
+    "http": "0.0.0",
+    "socket.io": "^1.5.1"
+  }
+}
