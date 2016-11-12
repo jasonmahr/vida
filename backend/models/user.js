@@ -11,5 +11,7 @@ module.exports = mongoose.model('User', new Schema({
     latitude: Number,
     longitude: Number,
     clubname: String,
-    description: String
+    description: String,
+    rating: Number,
+    total: Number
 }));

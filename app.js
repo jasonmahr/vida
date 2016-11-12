@@ -74,7 +74,7 @@ app.post('/api/signup', function(req, res) {
         }
         else {
             crypt.hashPassword(req.body.password, function(err, hashed) {
-                // create a sample user
+                // create a sample user, start with max rating
                 var user = new User({ 
                     name: req.body.username, 
                     password: hashed,
@@ -83,7 +83,9 @@ app.post('/api/signup', function(req, res) {
                     latitude: Number(req.body.latitude),
                     longitude: Number(req.body.longitude),
                     description: req.body.description,
-                    clubname: req.body.clubname
+                    clubname: req.body.clubname,
+                    rating: 5,
+                    total: 1
                 });
 
                 // save the user
@@ -127,34 +129,34 @@ app.post('/api/login', function(req, res) {
     User.findOne({
         name: req.body.username
     }, function(err, user) {
+        if (err) throw err;
 
-    if (err) throw err;
-
-    if (!user) {
-      res.json({ success: false, message: 'Authentication failed. User not found.' });
-    } else if (user) {
-
-      // check if password matches
-      crypt.verifyPassword(req.body.password, user.password, function(err, correct) {
-
-        if (err || !correct) {
-            res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+        if (!user) {
+          res.json({ success: false, message: 'Authentication failed. User not found.' });
         }
-        else {
-            // if user is found and password is right sets a cookie with the user's info
-            req.session.username = user.name;
-            req.session.club = user.club
+        else if (user) {
 
-            req.session.info = {
-                latitude: user.latitude,
-                longitude: user.longitude,
-                description: user.description,
-                clubname: user.clubname
+            // check if password matches
+            crypt.verifyPassword(req.body.password, user.password, function(err, correct) {
+
+            if (err || !correct) {
+                res.json({ success: false, message: 'Authentication failed. Wrong password.' });
             }
+            else {
+                // if user is found and password is right sets a cookie with the user's info
+                req.session.username = user.name;
+                req.session.club = user.club
 
-            res.json({ success: true});
-        }   
-      })
+                req.session.info = {
+                    latitude: user.latitude,
+                    longitude: user.longitude,
+                    description: user.description,
+                    clubname: user.clubname
+                }
+
+                res.json({ success: true});
+            }   
+        })
     }
 
   });
@@ -244,6 +246,47 @@ app.post('/api/close', function(req, res) {
         res.json({ success: false, message: "You need to be logged in as a business"});
     }
 });
+
+// lets a user rate a business and updates their trustworthiness
+app.post('/api/rate', function(req, res) {
+    if(req.session.username && !req.session.club) {
+        // find the user
+        User.findOne({
+            name: req.session.username
+        }, function(err, user) {
+            if (err) throw err;
+
+            if (!user) {
+              res.json({ success: false, message: 'Rating failed. User not found.' });
+            }
+            else {
+
+                // find the club's rating
+                User.findOne({
+                    name: req.body.club
+                }), function(err, club) {
+                    if (err) throw err;
+
+                    if (!club) {
+                        res.json({ success: false, message: 'Rating failed. Club not found.' });
+                    }
+                    else {
+                        // TODO 
+                        var trustworthiness = user.rating/user.total
+                        var clubRating = club.rating/club.total
+
+                        // TODO also update mongo for both user and club
+                    }
+                }
+            })
+        }
+
+      });
+    }
+    else {
+        res.json({ success: false, message: "You need to be logged in as a business"});
+    }
+})
 
 // make the server start and listen
 server.listen(process.env.PORT || 3000, function () {
