@@ -7,5 +7,9 @@ module.exports = mongoose.model('User', new Schema({
     name: String, 
     password: String, 
     admin: Boolean,
-    club: Boolean
+    club: Boolean,
+    latitude: Number,
+    longitude: Number,
+    clubname: String,
+    description: String
 }));

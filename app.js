@@ -44,9 +44,9 @@ var session = require('express-session');
 app.set('trust proxy', 1) // trust first proxy 
 
 app.use(session({
-  secret: config.secret,
-  resave: false,
-  saveUninitialized: true
+    secret: config.secret,
+    resave: false,
+    saveUninitialized: true
 }))
 
 // =======================
@@ -55,34 +55,78 @@ app.use(session({
 
 // user tries to signup to the service
 app.post('/api/signup', function(req, res) {
-    // TODO check if username already exists
-
-    crypt.hashPassword(req.body.password, function(err, hashed) {
-        // create a sample user
-        var user = new User({ 
-            name: req.body.username, 
-            password: hashed,
-            admin: false,
-            club: req.body.club
-        });
-
-        // save the user
-        user.save(function(err) {
+    // find the user
+    User.findOne({
+        name: req.body.username
+    }, function(err, user) {
         if (err) throw err;
-            console.log('User saved successfully');
-            res.json({ success: true });
-        });
-    })
+
+        var club = Boolean(req.body.club)
+
+        if (user) {
+            res.json({success: false, message: "Username already taken"})
+        }
+        else if(club && (!req.body.latitude || !req.body.longitude)) {
+            res.json({success: false, message: "Need business location"})
+        }
+        else if(club && (!req.body.description || !req.body.clubname)) {
+            res.json({success: false, message: "Need business details"})
+        }
+        else {
+            crypt.hashPassword(req.body.password, function(err, hashed) {
+                // create a sample user
+                var user = new User({ 
+                    name: req.body.username, 
+                    password: hashed,
+                    admin: false,
+                    club: club,
+                    latitude: Number(req.body.latitude),
+                    longitude: Number(req.body.longitude),
+                    description: req.body.description,
+                    clubname: req.body.clubname
+                });
+
+                // save the user
+                user.save(function(err) {
+                if (err) throw err;
+                    console.log('User saved successfully');
+                    res.json({ success: true });
+
+                    // if it's a club then we make the firebase entry for the club
+                    if(club) {
+                        var entry = {
+                            male: 0,
+                            female: 0,
+                            twenty: 0,
+                            thirty: 0,
+                            forty: 0,
+                            fifty: 0,
+                            latitude: Number(req.body.latitude),
+                            longitude: Number(req.body.longitude),
+                            name: req.body.clubname,
+                            description: req.body.description,
+                            closed: true
+                        }
+
+                        var update = {}
+                        update[req.body.username] = entry
+
+                        clubsRef.update(update)
+                    }
+                });
+            });
+        }
+    });
 });
 
 
 // authenticate the user
 app.post('/api/login', function(req, res) {
 
-  // find the user
-  User.findOne({
-    name: req.body.username
-  }, function(err, user) {
+    // find the user
+    User.findOne({
+        name: req.body.username
+    }, function(err, user) {
 
     if (err) throw err;
 
@@ -94,16 +138,21 @@ app.post('/api/login', function(req, res) {
       crypt.verifyPassword(req.body.password, user.password, function(err, correct) {
 
         if (err || !correct) {
-          res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-        } else {
+            res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+        }
+        else {
+            // if user is found and password is right sets a cookie with the user's info
+            req.session.username = user.name;
+            req.session.club = user.club
 
-          // if user is found and password is right
-          // sets a cookie with the user's info
-          req.session.username = user;
-          req.session.club = user.club
+            req.session.info = {
+                latitude: user.latitude,
+                longitude: user.longitude,
+                description: user.description,
+                clubname: user.clubname
+            }
 
-          res.json({ success: true});
-          
+            res.json({ success: true});
         }   
       })
     }
@@ -112,12 +161,94 @@ app.post('/api/login', function(req, res) {
 });
 
 
-// TODO route for updating firebase
+// route for businesses to update firebase
+app.post('/api/update', function(req, res) {
+    if(req.session.username && req.session.club) {
+        var gender = req.body.gender;
+        var delta = Number(req.body.delta);
+        var age = req.body.age;
+
+        clubsRef.child(req.session.username).once('value').then(function(snapshot) {
+            var entry = snapshot.val()
+            entry[gender] += delta;
+            entry[age] += delta;
+            entry['closed'] = false;
+
+            var update = {};
+            update[req.session.username] = entry;
+
+            clubsRef.update(update);
+            res.json({ success: true});
+
+        })
+    }
+    else {
+        res.json({ success: false, message: "You need to be logged in as a business"});
+    }
+});
+
+// route for businesses to open the club for the night
+app.post('/api/open', function(req, res) {
+    if(req.session.username && req.session.club) {
+        var entry = {
+            male: 0,
+            female: 0,
+            twenty: 0,
+            thirty: 0,
+            forty: 0,
+            fifty: 0,
+            closed: false
+        }
+
+        // persist business info
+        for(key in req.session.info) {
+            entry[key] = req.session.info[key]
+        }
+
+        var update = {}
+        update[req.session.username] = entry
+
+        clubsRef.update(update);
+        res.json({ success: true});
+    }
+    else {
+        res.json({ success: false, message: "You need to be logged in as a business"});
+    }
+});
+
+// route for businesses to close the club for the night
+app.post('/api/close', function(req, res) {
+    if(req.session.username && req.session.club) {
+        var entry = {
+            male: 0,
+            female: 0,
+            twenty: 0,
+            thirty: 0,
+            forty: 0,
+            fifty: 0,
+            closed: true
+        }
+
+        // persist business info
+        for(key in req.session.info) {
+            entry[key] = req.session.info[key]
+        }
+
+        var update = {}
+        update[req.session.username] = entry
+
+        clubsRef.update(update);
+        res.json({ success: true});
+    }
+    else {
+        res.json({ success: false, message: "You need to be logged in as a business"});
+    }
+});
 
 // make the server start and listen
 server.listen(process.env.PORT || 3000, function () {
-  var host = server.address().address;
-  var port = server.address().port;
+    var host = server.address().address;
+    var port = server.address().port;
 
-  console.log("Vida is running on port " + port);
+    console.log("Vida is running on port " + port);
 });
