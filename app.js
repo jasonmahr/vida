@@ -61,8 +61,9 @@ app.post('/api/signup', function(req, res) {
     }, function(err, user) {
         if (err) throw err;
 
-        var club = Boolean(req.body.club)
-
+        var club = req.body.club === 'true' || req.body.club === true;
+        console.log(club);
+        console.log(typeof(club))
         if (user) {
             res.json({success: false, message: "Username already taken"})
         }
@@ -75,18 +76,31 @@ app.post('/api/signup', function(req, res) {
         else {
             crypt.hashPassword(req.body.password, function(err, hashed) {
                 // create a sample user, start with max rating
-                var user = new User({ 
-                    name: req.body.username, 
-                    password: hashed,
-                    admin: false,
-                    club: club,
-                    latitude: Number(req.body.latitude),
-                    longitude: Number(req.body.longitude),
-                    description: req.body.description,
-                    clubname: req.body.clubname,
-                    rating: 5,
-                    total: 1
-                });
+                var user;
+                if(club) {
+                    user = new User({ 
+                        name: req.body.username, 
+                        password: hashed,
+                        admin: false,
+                        club: club,
+                        latitude: Number(req.body.latitude),
+                        longitude: Number(req.body.longitude),
+                        description: req.body.description,
+                        clubname: req.body.clubname,
+                        rating: 5,
+                        total: 1
+                    });
+                }
+                else {
+                    user = new User({ 
+                        name: req.body.username, 
+                        password: hashed,
+                        admin: false,
+                        club: club,
+                        rating: 5,
+                        total: 1
+                    });
+                }
 
                 // save the user
                 user.save(function(err) {
@@ -260,30 +274,44 @@ app.post('/api/rate', function(req, res) {
               res.json({ success: false, message: 'Rating failed. User not found.' });
             }
             else {
-
                 // find the club's rating
                 User.findOne({
-                    name: req.body.club
-                }), function(err, club) {
+                    name: req.body.clubname
+                }, function(err2, club) {
                     if (err) throw err;
 
                     if (!club) {
                         res.json({ success: false, message: 'Rating failed. Club not found.' });
                     }
                     else {
-                        // TODO 
+                        // online algorithm for the ratings, weights based on trustworthiness
                         var trustworthiness = user.rating/user.total
                         var clubRating = club.rating/club.total
 
-                        // TODO also update mongo for both user and club
+                        var newClubRating = club.rating + trustworthiness/5*Number(req.body.rating)
+                        var newClubTotal = club.total + trustworthiness/5
+
+                        var newUserRating = user.rating + 5-Math.abs(club.rating-Number(req.body.rating))
+                        var newUserTotal = user.total + 1
+                        User.findOneAndUpdate({name: req.session.username},
+                                              {$set: {rating : newUserRating, total: newUserTotal}},
+                                              {new: true}, function(err, doc) {
+                                                if (err) throw err;
+                                              });
+                        User.findOneAndUpdate({name: req.body.clubname},
+                                              {$set: {rating : newClubRating, total: newClubTotal}},
+                                              {new: true}, function(err, doc) {
+                                                if (err) throw err;
+                                              });
+                        res.json({ success: true, message: 'Thanks for the rating!'});
                     }
-                }
+                })
             }
         })
 
     }
     else {
-        res.json({ success: false, message: "You need to be logged in as a business"});
+        res.json({ success: false, message: "You need to be logged in as a customer"});
     }
 })
 
