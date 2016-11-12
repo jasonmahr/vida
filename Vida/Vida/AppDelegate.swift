@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Vida
 //
-//  Created by Ryoya Ogishima on 11/12/16.
+//  Created by Jason Mahr and Ryoya Ogishima on 11/12/16.
 //  Copyright © 2016 YHack16. All rights reserved.
 //
 
