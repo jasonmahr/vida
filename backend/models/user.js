@@ -8,10 +8,8 @@ module.exports = mongoose.model('User', new Schema({
     password: String, 
     admin: Boolean,
     club: Boolean,
-    latitude: Number,
-    longitude: Number,
     clubname: String,
-    description: String,
     rating: Number,
-    total: Number
+    total: Number,
+    email: String
 }));
