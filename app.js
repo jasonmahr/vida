@@ -68,8 +68,7 @@ app.post('/api/signup', function(req, res) {
         if (err) throw err;
 
         var club = req.body.club === 'true' || req.body.club === true;
-        console.log(club);
-        console.log(typeof(club))
+
         if (user) {
             res.json({success: false, message: "Username already taken"})
         } // TODO expand for more fields
@@ -239,8 +238,7 @@ app.post('/api/update', function(req, res) {
         // update on firebase
         clubsRef.child(req.session.username).once('value').then(function(snapshot) {
             var entry = snapshot.val()
-            entry[gender] += delta;
-            entry[age] += delta;
+            entry[gender][age] += delta;
             entry['closed'] = false;
 
             var update = {};
@@ -273,28 +271,17 @@ app.post('/api/update', function(req, res) {
 app.post('/api/open', function(req, res) {
     if(req.session.username && req.session.club) {
 
-        // TODO get firebase data and do a negative click of everyone leaving
+        // update on firebase, precondition: all values should be 0 for male/female
+        clubsRef.child(req.session.username).once('value').then(function(snapshot) {
+            var entry = snapshot.val()
+            entry['closed'] = false;
 
-        var entry = {
-            male: 0,
-            female: 0,
-            twenty: 0,
-            thirty: 0,
-            forty: 0,
-            fifty: 0,
-            closed: false
-        }
+            var update = {};
+            update[req.session.username] = entry;
 
-        // persist business info
-        for(key in req.session.info) {
-            entry[key] = req.session.info[key]
-        }
-
-        var update = {}
-        update[req.session.username] = entry
-
-        clubsRef.update(update);
-        res.json({ success: true});
+            clubsRef.update(update);
+            res.json({ success: true});
+        });        
     }
     else {
         res.json({ success: false, message: "You need to be logged in as a business"});
@@ -305,28 +292,54 @@ app.post('/api/open', function(req, res) {
 app.post('/api/close', function(req, res) {
     if(req.session.username && req.session.club) {
 
-        // TODO get firebase data and do a negative click of everyone leaving
+        // update on firebase
+        clubsRef.child(req.session.username).once('value').then(function(snapshot) {
+            var entry = snapshot.val();
 
-        var entry = {
-            male: 0,
-            female: 0,
-            twenty: 0,
-            thirty: 0,
-            forty: 0,
-            fifty: 0,
-            closed: true
-        }
+            // make all of the males leave
+            for(i in entry['male']) {
+                // save a click
+                click = new Click({
+                    time: Date.now(),
+                    gender: 'male',
+                    delta: -1*entry['male'][i],
+                    age: i
+                });
 
-        // persist business info
-        for(key in req.session.info) {
-            entry[key] = req.session.info[key]
-        }
+                Club.findOneAndUpdate({name: req.session.info.clubname},
+                    {$push: {"clicks": click}},
+                    {safe: true, upsert: true}, function(err, club) {
+                        if (err) throw err;
+                });
+                entry['male'][i] = 0
+            }
 
-        var update = {}
-        update[req.session.username] = entry
+            // make all of the females leave
+            for(i in entry['female']) {
+                // save a click
+                click = new Click({
+                    time: Date.now(),
+                    gender: 'female',
+                    delta: -1*entry['female'][i],
+                    age: i
+                });
 
-        clubsRef.update(update);
-        res.json({ success: true});
+                Club.findOneAndUpdate({name: req.session.info.clubname},
+                    {$push: {"clicks": click}},
+                    {safe: true, upsert: true}, function(err, club) {
+                        if (err) throw err;
+                });
+                entry['female'][i] = 0
+            }
+
+            entry['closed'] = true;
+
+            var update = {};
+            update[req.session.username] = entry;
+
+            clubsRef.update(update);
+            res.json({ success: true});
+        });        
     }
     else {
         res.json({ success: false, message: "You need to be logged in as a business"});
