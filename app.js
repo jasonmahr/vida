@@ -415,6 +415,7 @@ app.post('/api/rate', function(req, res) {
                         res.json({ success: false, message: 'Rating failed. Club not found.' });
                     }
                     else {
+                        console.log("updating...")
                         // online algorithm for the ratings, weights based on trustworthiness
                         var trustworthiness = user.rating/user.total
                         var clubRating = club.rating/club.total
@@ -446,8 +447,13 @@ app.post('/api/rate', function(req, res) {
                             {$push: {"ratings": rating}},
                             {safe: true, upsert: true}, function(err, club) {
                                 if (err) throw err;
-                                res.json({ success: true});
                         })
+
+                        clubsRef.child(req.body.clubname).once('value').then(function(snapshot) {
+                            var entry = snapshot.val()
+                            entry['rating'] = newClubRating/newClubTotal;
+                            clubsRef.child(req.body.clubname).update(entry);
+                        });
 
                         res.json({ success: true, message: 'Thanks for the rating!'});
                     }
