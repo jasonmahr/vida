@@ -11,6 +11,9 @@ import UIKit
 class ListViewController: UIViewController {
     
     var i = 0
+    let semaphore = DispatchSemaphore(value: 0)
+    var json2 = JSON([])
+
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var address: UILabel!
     @IBOutlet weak var rating: UILabel!
@@ -47,20 +50,23 @@ class ListViewController: UIViewController {
                 let result = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)!
                 print(result)
                 var json = JSON(data: data!)
-                self.name.text = json["info"][self.i]["name"].string
-                self.address.text = json["info"][self.i]["address"].string
-                self.rating.text = json["info"][self.i]["rating"].string
-                self.male.text = json["info"][self.i]["male"].string
-                self.female.text = json["info"][self.i]["female"].string
+                self.json2 = json["info"]
             } else {
                 print(error as Any)
             }
+            self.semaphore.signal()
         })
         task.resume()
     }
 
     @IBAction func initiate(_ sender: UIButton) {
         getAsync(sender: sender)
+        self.semaphore.wait()
+        self.name.text = json2[self.i]["name"].string
+        self.address.text = json2[self.i]["address"].string
+        self.rating.text = json2[self.i]["rating"].string
+        self.male.text = json2[self.i]["male"].string
+        self.female.text = json2[self.i]["female"].string
         i += 1
     }
 }
