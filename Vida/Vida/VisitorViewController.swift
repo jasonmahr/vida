@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 class VisitorViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var label: UILabel!
@@ -17,6 +16,9 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
     
     var email_txt = ""
     var pass_txt = ""
+    var tmp = 0
+    // wait until postAsync ends
+    let semaphore = DispatchSemaphore(value: 0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +34,6 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
 
     @IBAction func email(_ sender: UITextField) {
         email_txt = sender.text!
-        label.text = email_txt
     }
     @IBAction func password(_ sender: UITextField) {
         pass_txt = sender.text!
@@ -76,8 +77,13 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
         let task = URLSession.shared.dataTask(with: request as URLRequest, completionHandler: {data, response, error in
             if (error == nil) {
                 let result = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)!
-                //response
                 print(result)
+                var json = JSON(data: data!)
+                print(json["success"])
+                if json["success"] == true{
+                    self.tmp = 1
+                    self.semaphore.signal()
+                }
             } else {
                 print(error as Any)
             }
@@ -87,5 +93,16 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func login_button(_ sender: UIButton) {
         postAsync(sender: sender)
+        self.semaphore.wait()
+        print(self.tmp)
+        if tmp == 1 {
+            let storyboard: UIStoryboard = self.storyboard!
+            let nextView = storyboard.instantiateViewController(withIdentifier: "next") as! UITabBarController
+            self.present(nextView, animated: true, completion: nil)
+        }
+        if tmp == 0{
+            label.text = "error"
+            print(self.semaphore.description)
+        }
     }
 }

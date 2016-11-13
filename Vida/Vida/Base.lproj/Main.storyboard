@@ -285,7 +285,6 @@
                                 <state key="normal" title="Log in"/>
                                 <connections>
                                     <action selector="login_button:" destination="xPh-t2-8id" eventType="touchUpInside" id="MUm-gj-Jw0"/>
-                                    <segue destination="O1l-5I-1qB" kind="show" id="EJz-VM-C6n"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Email" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1JD-OG-1Mr">
@@ -327,7 +326,7 @@
                                 </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yxx-hD-GWX">
-                                <rect key="frame" x="168" y="188" width="120" height="30"/>
+                                <rect key="frame" x="100" y="491" width="120" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -405,7 +404,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="DQu-S9-hAV">
             <objects>
-                <tabBarController id="O1l-5I-1qB" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="next" id="O1l-5I-1qB" sceneMemberID="viewController">
                     <tabBar key="tabBar" contentMode="scaleToFill" id="t4R-4A-RX9">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
