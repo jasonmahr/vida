@@ -10,7 +10,7 @@ import UIKit
 
 class ListViewController: UIViewController {
     
-    var tmp: [String] = []
+    var tmp: [Dictionary] = []
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var address: UILabel!
     @IBOutlet weak var rating: UILabel!
@@ -49,9 +49,8 @@ class ListViewController: UIViewController {
                 let result = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)!
                 print(result)
                 var json = JSON(data: data!)
-                print(json["info"])
-                let tmp2: String = json["info"]
-                tmp += tmp2
+                print(json["info"][0])
+                tmp = json["info"]
             } else {
                 print(error as Any)
             }
