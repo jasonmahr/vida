@@ -85,7 +85,6 @@ class ViewController: UIViewController {
         
         // prepare json data
         let params = ["gender": gender, "delta": delta, "age": age] as [String : Any]
-        print("hoe")
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: params)
         }catch _ as NSError{}

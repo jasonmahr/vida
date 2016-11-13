@@ -302,26 +302,8 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Pb4-0r-idO">
-                                <rect key="frame" x="29" y="311" width="97" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                                <connections>
-                                    <action selector="password:" destination="xPh-t2-8id" eventType="editingDidEndOnExit" id="3jA-iP-ihq"/>
-                                    <action selector="password:" destination="xPh-t2-8id" eventType="editingDidEnd" id="7wn-qd-lXE"/>
-                                </connections>
-                            </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yxx-hD-GWX">
-                                <rect key="frame" x="139" y="381" width="42" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="IN6-uy-asJ">
-                                <rect key="frame" x="29" y="188" width="97" height="30"/>
+                                <rect key="frame" x="29" y="189" width="97" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -329,13 +311,35 @@
                                 <connections>
                                     <action selector="email:" destination="xPh-t2-8id" eventType="editingDidEnd" id="4Pq-EA-szS"/>
                                     <action selector="email:" destination="xPh-t2-8id" eventType="editingDidEndOnExit" id="LBG-z6-fG6"/>
+                                    <action selector="email:" destination="xPh-t2-8id" eventType="editingChanged" id="SnE-8h-9SM"/>
                                 </connections>
                             </textField>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Pb4-0r-idO">
+                                <rect key="frame" x="29" y="311" width="97" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <action selector="password:" destination="xPh-t2-8id" eventType="editingDidEndOnExit" id="473-4L-Pv2"/>
+                                    <action selector="password:" destination="xPh-t2-8id" eventType="editingDidEnd" id="7wn-qd-lXE"/>
+                                    <action selector="password:" destination="xPh-t2-8id" eventType="editingChanged" id="NpT-8E-BoI"/>
+                                </connections>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yxx-hD-GWX">
+                                <rect key="frame" x="168" y="188" width="120" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <connections>
+                        <outlet property="email_out" destination="IN6-uy-asJ" id="AEL-Bz-F3L"/>
                         <outlet property="label" destination="yxx-hD-GWX" id="yAx-7r-cTh"/>
+                        <outlet property="pass_out" destination="Pb4-0r-idO" id="aJo-j5-F8g"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nnU-f4-TaJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
