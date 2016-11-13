@@ -186,6 +186,9 @@ app.post('/api/signup', function(req, res) {
 app.post('/api/login', function(req, res) {
 
     // find the user, TODO add support for email address lookup
+    if(!req.body.email) {
+        req.body.email = ""
+    }
     User.findOne({$or: [{name: req.body.username}, {email:req.body.email}]},
         function(err, user) {
         if (err) throw err;
@@ -202,6 +205,7 @@ app.post('/api/login', function(req, res) {
                 res.json({ success: false, message: 'Authentication failed. Wrong password.' });
             }
             else {
+                console.log(user)
                 // if user is found and password is right sets a cookie with the user's info
                 req.session.username = user.name;
                 req.session.club = user.club
