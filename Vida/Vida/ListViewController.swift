@@ -10,7 +10,7 @@ import UIKit
 
 class ListViewController: UIViewController {
     
-    var tmp: [Dictionary] = []
+    var i = 0
     @IBOutlet weak var name: UILabel!
     @IBOutlet weak var address: UILabel!
     @IBOutlet weak var rating: UILabel!
@@ -26,15 +26,13 @@ class ListViewController: UIViewController {
         rating.text = ""
         male.text = ""
         female.text = ""
-        
-        getAsync()
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func getAsync() {
+    @IBAction func getAsync(sender: AnyObject) {
         
         // create the url-request
         let urlString = "https://vida.herokuapp.com/api/clubs"
@@ -49,14 +47,20 @@ class ListViewController: UIViewController {
                 let result = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)!
                 print(result)
                 var json = JSON(data: data!)
-                print(json["info"][0])
-                tmp = json["info"]
+                self.name.text = json["info"][self.i]["name"].string
+                self.address.text = json["info"][self.i]["address"].string
+                self.rating.text = json["info"][self.i]["rating"].string
+                self.male.text = json["info"][self.i]["male"].string
+                self.female.text = json["info"][self.i]["female"].string
             } else {
                 print(error as Any)
             }
         })
         task.resume()
     }
-    func get_a_club(num: Int){
+
+    @IBAction func initiate(_ sender: UIButton) {
+        getAsync(sender: sender)
+        i += 1
     }
 }
