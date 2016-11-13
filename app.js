@@ -56,10 +56,16 @@ app.use(session({
 }))
 
 // =======================
-// routes ================
+// API routes ============
 // =======================
 
-// user tries to signup to the service
+/* User tries to sign up for the app.
+ * Input:
+ *      name, password, club:boolean indicating if is club (required);
+ *      required for business: latitude, longitude, address, clubname (formal business name),
+ *          description, phone, price
+ * Output: {success: true/false}
+ */
 app.post('/api/signup', function(req, res) {
     // find the user
     User.findOne({
@@ -170,7 +176,11 @@ app.post('/api/signup', function(req, res) {
 });
 
 
-// authenticate the user
+/* Authenticates the user for the app and creates session data.
+ * Input:
+ *      name, password
+ * Output: {success: true/false}
+ */
 app.post('/api/login', function(req, res) {
 
     // find the user, TODO add support for email address lookup
@@ -215,6 +225,7 @@ app.post('/api/login', function(req, res) {
                         res.json({ success: true});
                     });
                 }
+                // otherwise it's just a user
                 else {
                     req.session.info = {}
                     res.json({ success: true});
@@ -226,9 +237,27 @@ app.post('/api/login', function(req, res) {
   });
 });
 
-// TODO logout
+/* Destroys session data to allow the user to logout.
+ * Input: N/A
+ * 
+ * Output: {success: true/false}
+ */
+app.post('/api/login', function(req, res) {
+    req.session.destroy(function(err) {
+        if(err) {
+            res.json({success: false})
+        }
+        else {
+            res.json({success: true})
+        }
+    })
+});
 
-// route for businesses to update firebase
+/* Business user updates person counts
+ * Input:
+ *      gender:String, delta:Number, age: in [0...5]
+ * Output: {success: true/false}
+ */
 app.post('/api/update', function(req, res) {
     if(req.session.username && req.session.club) {
         var gender = req.body.gender;
@@ -267,7 +296,11 @@ app.post('/api/update', function(req, res) {
     }
 });
 
-// route for businesses to open the club for the night
+/* The business opens up for the next day. Assumes nobody was there.
+ * Input: N/A
+ *      
+ * Output: {success: true/false}
+ */
 app.post('/api/open', function(req, res) {
     if(req.session.username && req.session.club) {
 
@@ -288,7 +321,11 @@ app.post('/api/open', function(req, res) {
     }
 });
 
-// route for businesses to close the club for the night
+/* The business closes up for the night. Makes everyone leave the club.
+ * Input: N/A
+ *      
+ * Output: {success: true/false}
+ */
 app.post('/api/close', function(req, res) {
     if(req.session.username && req.session.club) {
 
@@ -346,7 +383,13 @@ app.post('/api/close', function(req, res) {
     }
 });
 
-// lets a user rate a business and updates their trustworthiness
+/* Lets a user add a review for a business. It also updates the trustworthiness of a
+ *      user's reviews. The effect on the review gets more swayed by a more trustworthy
+ *      user.
+ * Input: clubname:String, rating:int in [1...5], comment:String
+ *      
+ * Output: {success: true/false}
+ */
 app.post('/api/rate', function(req, res) {
     if(req.session.username && !req.session.club) {
         // find the user
@@ -416,12 +459,21 @@ app.post('/api/rate', function(req, res) {
 });
 
 
-// gets the user rating for certain users, TODO restrict to businesses?
+/* Gets the rating of a User if that user is a business.
+ * Input: embed username in query of http request.
+ *      
+ * Output: {success: true/false, rating: Number}
+ */
 app.get('/api/rating/:username', function(req, res) {
     User.findOne({name: req.params.username}, function(err, user) {
         if (err) throw err;
 
-        res.json({ success: true, rating: user.rating/user.total});
+        if(user && user.club) {
+            res.json({ success: true, rating: user.rating/user.total});
+        }
+        else {
+            res.json({ success: false, rating: user.rating/user.total});
+        }
     })
 });
 
