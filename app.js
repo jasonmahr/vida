@@ -423,7 +423,7 @@ app.post('/api/rate', function(req, res) {
                         var newClubRating = club.rating + trustworthiness/5*Number(req.body.rating)
                         var newClubTotal = club.total + trustworthiness/5
 
-                        var newUserRating = user.rating + 5-Math.abs(club.rating-Number(req.body.rating))
+                        var newUserRating = user.rating + Math.abs(5-Math.abs(club.rating-Number(req.body.rating)))
                         var newUserTotal = user.total + 1
                         User.findOneAndUpdate({name: req.session.username},
                                               {$set: {rating : newUserRating, total: newUserTotal}},
