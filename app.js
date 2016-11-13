@@ -389,7 +389,7 @@ app.post('/api/close', function(req, res) {
 /* Lets a user add a review for a business. It also updates the trustworthiness of a
  *      user's reviews. The effect on the review gets more swayed by a more trustworthy
  *      user.
- * Input: clubname:String, rating:int in [1...5], comment:String
+ * Input: {clubname:String, rating:int in [1...5], comment:String}
  *      
  * Output: {success: true/false}
  */
@@ -415,6 +415,7 @@ app.post('/api/rate', function(req, res) {
                         res.json({ success: false, message: 'Rating failed. Club not found.' });
                     }
                     else {
+                        console.log("updating...")
                         // online algorithm for the ratings, weights based on trustworthiness
                         var trustworthiness = user.rating/user.total
                         var clubRating = club.rating/club.total
@@ -422,7 +423,7 @@ app.post('/api/rate', function(req, res) {
                         var newClubRating = club.rating + trustworthiness/5*Number(req.body.rating)
                         var newClubTotal = club.total + trustworthiness/5
 
-                        var newUserRating = user.rating + 5-Math.abs(club.rating-Number(req.body.rating))
+                        var newUserRating = user.rating + Math.abs(5-Math.abs(club.rating-Number(req.body.rating)))
                         var newUserTotal = user.total + 1
                         User.findOneAndUpdate({name: req.session.username},
                                               {$set: {rating : newUserRating, total: newUserTotal}},
@@ -446,8 +447,13 @@ app.post('/api/rate', function(req, res) {
                             {$push: {"ratings": rating}},
                             {safe: true, upsert: true}, function(err, club) {
                                 if (err) throw err;
-                                res.json({ success: true});
                         })
+
+                        clubsRef.child(req.body.clubname).once('value').then(function(snapshot) {
+                            var entry = snapshot.val()
+                            entry['rating'] = newClubRating/newClubTotal;
+                            clubsRef.child(req.body.clubname).update(entry);
+                        });
 
                         res.json({ success: true, message: 'Thanks for the rating!'});
                     }
