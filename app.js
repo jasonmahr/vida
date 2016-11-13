@@ -494,12 +494,12 @@ app.get('/api/clubs', function(req, res) {
         for(name in entries) {
             var entry = entries[name];
 
-            var m = {'name': entry['name'],
-                     'male': entry['male'].reduce(function(a,b){return a+b}),
-                     'female': entry['female'].reduce(function(a,b){return a+b}),
-                     'address': entry['address'],
-                     'rating': entry['rating'],
-                     'username': name
+            var m = {'name': String(entry['name']),
+                     'male': String(entry['male'].reduce(function(a,b){return a+b})),
+                     'female': String(entry['female'].reduce(function(a,b){return a+b})),
+                     'address': String(entry['address']),
+                     'rating': String(entry['rating']),
+                     'username': String(name)
                  };
 
             massaged.push(m)
