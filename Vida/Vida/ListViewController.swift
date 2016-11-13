@@ -67,6 +67,6 @@ class ListViewController: UIViewController {
         self.rating.text = json2[self.i]["rating"].string
         self.male.text = json2[self.i]["male"].string
         self.female.text = json2[self.i]["female"].string
-        i += 1
+        i = (i+1)%(json2.count)
     }
 }
