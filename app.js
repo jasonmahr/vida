@@ -389,7 +389,7 @@ app.post('/api/close', function(req, res) {
 /* Lets a user add a review for a business. It also updates the trustworthiness of a
  *      user's reviews. The effect on the review gets more swayed by a more trustworthy
  *      user.
- * Input: clubname:String, rating:int in [1...5], comment:String
+ * Input: {clubname:String, rating:int in [1...5], comment:String}
  *      
  * Output: {success: true/false}
  */
