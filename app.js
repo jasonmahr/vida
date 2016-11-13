@@ -61,7 +61,7 @@ app.use(session({
 
 /* User tries to sign up for the app.
  * Input:
- *      name, password, club:boolean indicating if is club (required);
+ *      name, email, password, club:boolean indicating if is club (required);
  *      required for business: latitude, longitude, address, clubname (formal business name),
  *          description, phone, price
  * Output: {success: true/false}
@@ -92,6 +92,7 @@ app.post('/api/signup', function(req, res) {
                     user = new User({ 
                         name: req.body.username, 
                         password: hashed,
+                        email: req.body.email,
                         admin: false,
                         club: club,
                         clubname: req.body.clubname,
@@ -104,6 +105,7 @@ app.post('/api/signup', function(req, res) {
                     user = new User({ 
                         name: req.body.username, 
                         password: hashed,
+                        email: req.body.email,
                         admin: false,
                         club: club,
                         rating: 5,
@@ -178,15 +180,14 @@ app.post('/api/signup', function(req, res) {
 
 /* Authenticates the user for the app and creates session data.
  * Input:
- *      name, password
- * Output: {success: true/false}
+ *      name/email, password
+ * Output: {success: true/false, client: {"user", "business"} (if success)}
  */
 app.post('/api/login', function(req, res) {
 
     // find the user, TODO add support for email address lookup
-    User.findOne({
-        name: req.body.username
-    }, function(err, user) {
+    User.findOne({$or: [{name: req.body.username}, {email:req.body.email}]},
+        function(err, user) {
         if (err) throw err;
 
         if (!user) {
@@ -222,13 +223,13 @@ app.post('/api/login', function(req, res) {
                             special: club.specials[club.specials.length-1]
                         }
 
-                        res.json({ success: true});
+                        res.json({ success: true, client: 'business'});
                     });
                 }
                 // otherwise it's just a user
                 else {
                     req.session.info = {}
-                    res.json({ success: true});
+                    res.json({ success: true, client: 'user'});
                 }
             }   
         })
