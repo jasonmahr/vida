@@ -480,6 +480,34 @@ app.get('/api/rating/:username', function(req, res) {
     })
 });
 
+/* Gets relevant info for all businesses.
+ * Input: N/A
+ *      
+ * Output: [{name: String, male: Number, female: Number, address: String, username: String}...]
+ */
+app.get('/api/clubs', function(req, res) {
+    clubsRef.once('value').then(function(snapshot) {
+        var entries = snapshot.val();
+
+        var massaged = [];
+
+        for(name in entries) {
+            var entry = entries[name];
+
+            var m = {'name': entry['name'],
+                     'male': entry['male'].reduce(function(a,b){return a+b}),
+                     'female': entry['female'].reduce(function(a,b){return a+b}),
+                     'address': entry['address'],
+                     'username': name
+                 };
+
+            massaged.push(m)
+        }
+
+        res.json({ info: massaged });
+    });   
+});
+
 // make the server start and listen
 server.listen(process.env.PORT || 3000, function () {
     var host = server.address().address;
