@@ -12,6 +12,8 @@ import UIKit
 class VisitorViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var email_out: UITextField!
+    @IBOutlet weak var pass_out: UITextField!
     
     var email_txt = ""
     var pass_txt = ""
@@ -19,6 +21,9 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = UIColor.white
+        label.text = ""
+        self.email_out.delegate = self
+        self.pass_out.delegate = self
     }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -29,10 +34,13 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
         email_txt = sender.text!
         label.text = email_txt
     }
-    
     @IBAction func password(_ sender: UITextField) {
         pass_txt = sender.text!
+    }
 
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
     }
     
     func postAsync(sender: AnyObject) {
@@ -57,8 +65,9 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
 //        ]
         
         // prepare json data
-        let params = [ "username": "bob", "password": "derp"] as [String : Any]
-        print("hoe")
+        let params = [ "email": email_txt, "password": pass_txt] as [String : Any]
+        print(email_txt)
+        print(pass_txt)
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: params)
         }catch _ as NSError{}
@@ -67,6 +76,7 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
         let task = URLSession.shared.dataTask(with: request as URLRequest, completionHandler: {data, response, error in
             if (error == nil) {
                 let result = NSString(data: data!, encoding: String.Encoding.utf8.rawValue)!
+                //response
                 print(result)
             } else {
                 print(error as Any)
