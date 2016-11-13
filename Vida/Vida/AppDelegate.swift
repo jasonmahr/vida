@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Vida
 //
-//  Created by Jason Mahr and Ryoya Ogishima on 11/12/16.
+//  Created by Ryoya Ogishima on 11/12/16.
 //  Copyright © 2016 YHack16. All rights reserved.
 //
 
@@ -17,26 +17,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        
-//        // judge login state
-//        var ud = UserDefaults.standard
-//        var isLogin: Bool? = ud.object(forKey: "isLogin") as? Bool
-//        
-//        //if not login yet
-//        if isLogin != nil && isLogin! {
-//            var viewController: MemberViewController = MemberViewController()
-//            navigationController = UINavigationController(rootViewController: viewController)
-//            self.window = UIWindow(frame: UIScreen.main.bounds)
-//            self.window?.rootViewController = navigationController
-//            self.window?.makeKeyAndVisible()
-//        // if already login
-//        } else {
-//            var viewController: VisitorViewController = VisitorViewController()
-//            navigationController = UINavigationController(rootViewController: viewController)
-//            self.window = UIWindow(frame: UIScreen.main.bounds)
-//            self.window?.rootViewController = navigationController
-//            self.window?.makeKeyAndVisible()
-//        }
         return true
     }
 

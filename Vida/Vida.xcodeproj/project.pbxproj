@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		265FBDCA1DD7CC63005C1B7F /* VisitorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FBDC91DD7CC63005C1B7F /* VisitorViewController.swift */; };
-		265FBDCC1DD7CD94005C1B7F /* MemberViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265FBDCB1DD7CD94005C1B7F /* MemberViewController.swift */; };
 		266841651DD779ED00585B84 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266841641DD779ED00585B84 /* AppDelegate.swift */; };
 		266841671DD779ED00585B84 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266841661DD779ED00585B84 /* ViewController.swift */; };
 		2668416A1DD779ED00585B84 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 266841681DD779ED00585B84 /* Main.storyboard */; };
@@ -38,7 +37,6 @@
 
 /* Begin PBXFileReference section */
 		265FBDC91DD7CC63005C1B7F /* VisitorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisitorViewController.swift; sourceTree = "<group>"; };
-		265FBDCB1DD7CD94005C1B7F /* MemberViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemberViewController.swift; sourceTree = "<group>"; };
 		266841611DD779ED00585B84 /* Vida.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Vida.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		266841641DD779ED00585B84 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		266841661DD779ED00585B84 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -111,7 +109,6 @@
 				266841701DD779ED00585B84 /* Info.plist */,
 				266841921DD79CBC00585B84 /* CustomClass.swift */,
 				265FBDC91DD7CC63005C1B7F /* VisitorViewController.swift */,
-				265FBDCB1DD7CD94005C1B7F /* MemberViewController.swift */,
 			);
 			path = Vida;
 			sourceTree = "<group>";
@@ -271,7 +268,6 @@
 				266841931DD79CBC00585B84 /* CustomClass.swift in Sources */,
 				265FBDCA1DD7CC63005C1B7F /* VisitorViewController.swift in Sources */,
 				266841671DD779ED00585B84 /* ViewController.swift in Sources */,
-				265FBDCC1DD7CD94005C1B7F /* MemberViewController.swift in Sources */,
 				266841651DD779ED00585B84 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
