@@ -84,6 +84,9 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
                     self.tmp = 1
                     self.semaphore.signal()
                 }
+                else {
+                    self.semaphore.signal()
+                }
             } else {
                 print(error as Any)
             }
@@ -100,9 +103,8 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
             let nextView = storyboard.instantiateViewController(withIdentifier: "next") as! UITabBarController
             self.present(nextView, animated: true, completion: nil)
         }
-        if tmp == 0{
+        else {
             label.text = "error"
-            print(self.semaphore.description)
         }
     }
 }
