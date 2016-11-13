@@ -17,6 +17,7 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
     var email_txt = ""
     var pass_txt = ""
     var tmp = 0
+    var biz = 0
     // wait until postAsync ends
     let semaphore = DispatchSemaphore(value: 0)
     
@@ -83,6 +84,9 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
                 if json["success"] == true{
                     self.tmp = 1
                 }
+                if json["client"] == "user" {
+                    self.biz = 1
+                }
             } else {
                 print(error as Any)
             }
@@ -96,9 +100,14 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
         self.semaphore.wait()
         print(self.tmp)
         if tmp == 1 {
-            let storyboard: UIStoryboard = self.storyboard!
-            let nextView = storyboard.instantiateViewController(withIdentifier: "next") as! UITabBarController
-            self.present(nextView, animated: true, completion: nil)
+            if self.biz == 0 {
+                let storyboard: UIStoryboard = self.storyboard!
+                let nextView = storyboard.instantiateViewController(withIdentifier: "next") as! UITabBarController
+                self.present(nextView, animated: true, completion: nil)
+            } else {
+                // TODO make it go to the client page
+            }
+            
         }
         else {
             label.text = "Login failed! Try again! :D"
