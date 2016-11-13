@@ -498,6 +498,7 @@ app.get('/api/clubs', function(req, res) {
                      'male': entry['male'].reduce(function(a,b){return a+b}),
                      'female': entry['female'].reduce(function(a,b){return a+b}),
                      'address': entry['address'],
+                     'rating': entry['rating'],
                      'username': name
                  };
 
