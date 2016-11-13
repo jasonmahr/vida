@@ -105,9 +105,10 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
                 let nextView = storyboard.instantiateViewController(withIdentifier: "next") as! UITabBarController
                 self.present(nextView, animated: true, completion: nil)
             } else {
-                // TODO make it go to the client page
+                let storyboard: UIStoryboard = self.storyboard!
+                let nextView = storyboard.instantiateViewController(withIdentifier: "user_next") as! ListViewController
+                self.present(nextView, animated: true, completion: nil)
             }
-            
         }
         else {
             label.text = "Login failed! Try again! :D"

@@ -6,7 +6,6 @@
 //  Copyright © 2016 YHack16. All rights reserved.
 //
 
-import Foundation
 import UIKit
 
 @IBDesignable class CustomButton: UIButton {
