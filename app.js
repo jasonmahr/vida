@@ -17,6 +17,12 @@ var mongoose = require('mongoose')
 var config = require('./backend/config'); // get our config file
 var User = require('./backend/models/user'); // get our mongoose model
 
+var Click = require('./backend/models/click');
+var Hour = require('./backend/models/hour');
+var Special = require('./backend/models/special');
+var Rating = require('./backend/models/rating');
+var Club = require('./backend/models/club');
+
 mongoose.connect(config.database); // connect to database
 
 // use body parser so we can get info from POST and/or URL parameters
@@ -62,11 +68,10 @@ app.post('/api/signup', function(req, res) {
         if (err) throw err;
 
         var club = req.body.club === 'true' || req.body.club === true;
-        console.log(club);
-        console.log(typeof(club))
+
         if (user) {
             res.json({success: false, message: "Username already taken"})
-        }
+        } // TODO expand for more fields
         else if(club && (!req.body.latitude || !req.body.longitude)) {
             res.json({success: false, message: "Need business location"})
         }
@@ -83,13 +88,11 @@ app.post('/api/signup', function(req, res) {
                         password: hashed,
                         admin: false,
                         club: club,
-                        latitude: Number(req.body.latitude),
-                        longitude: Number(req.body.longitude),
-                        description: req.body.description,
                         clubname: req.body.clubname,
                         rating: 5,
                         total: 1
                     });
+
                 }
                 else {
                     user = new User({ 
@@ -110,24 +113,55 @@ app.post('/api/signup', function(req, res) {
 
                     // if it's a club then we make the firebase entry for the club
                     if(club) {
-                        var entry = {
-                            male: 0,
-                            female: 0,
-                            twenty: 0,
-                            thirty: 0,
-                            forty: 0,
-                            fifty: 0,
+                        var entry = { // twenty, twfive, thirty, thfive, forty, ffive
+                            male: [0,0,0,0,0,0],
+                            female: [0,0,0,0,0,0],
                             latitude: Number(req.body.latitude),
                             longitude: Number(req.body.longitude),
                             name: req.body.clubname,
                             description: req.body.description,
-                            closed: true
+                            address: req.body.address,
+                            phone: req.body.phone,
+                            price: req.body.price,
+                            rating: 5, // start with a good rating when signup
+                            closed: true,
+                            special: null
                         }
 
                         var update = {}
                         update[req.body.username] = entry
 
                         clubsRef.update(update)
+
+                        var hours = []
+
+                        for(i in req.body.hours) {
+                            h = req.body.hours[i]
+                            hour = new Hour({
+                                start: h["start"],
+                                end: h['end'],
+                                days: h['days']
+                            });
+
+                            hours.push(h);
+                        }
+
+                        club = new Club({
+                            name: req.body.clubname,
+                            latitude: req.body.latitude,
+                            longitude: req.body.longitude,
+                            address: req.body.address,
+                            phone: req.body.phone,
+                            price: req.body.price,
+                            email: req.body.email,
+                            description: req.body.description,
+                            hours: hours,
+                            ratings: [],
+                            clicks: [],
+                            specials: []
+                        });
+
+                        club.save(function(err) {if(err) throw err;});
                     }
                 });
             });
@@ -139,7 +173,7 @@ app.post('/api/signup', function(req, res) {
 // authenticate the user
 app.post('/api/login', function(req, res) {
 
-    // find the user
+    // find the user, TODO add support for email address lookup
     User.findOne({
         name: req.body.username
     }, function(err, user) {
@@ -161,14 +195,30 @@ app.post('/api/login', function(req, res) {
                 req.session.username = user.name;
                 req.session.club = user.club
 
-                req.session.info = {
-                    latitude: user.latitude,
-                    longitude: user.longitude,
-                    description: user.description,
-                    clubname: user.clubname
-                }
+                // if it's a club, then load in relevant club data for session
+                if (user.club) {
+                    Club.findOne({
+                        name: user.clubname
+                    }, function(err, club) {
+                        req.session.info = {
+                            latitude: club.latitude,
+                            longitude: club.longitude,
+                            description: club.description,
+                            clubname: club.name,
+                            phone: club.phone,
+                            hours: club.hours,
+                            price: club.price,
+                            address: club.address,
+                            special: club.specials[club.specials.length-1]
+                        }
 
-                res.json({ success: true});
+                        res.json({ success: true});
+                    });
+                }
+                else {
+                    req.session.info = {}
+                    res.json({ success: true});
+                }
             }   
         })
     }
@@ -176,6 +226,7 @@ app.post('/api/login', function(req, res) {
   });
 });
 
+// TODO logout
 
 // route for businesses to update firebase
 app.post('/api/update', function(req, res) {
@@ -184,18 +235,31 @@ app.post('/api/update', function(req, res) {
         var delta = Number(req.body.delta);
         var age = req.body.age;
 
+        // update on firebase
         clubsRef.child(req.session.username).once('value').then(function(snapshot) {
             var entry = snapshot.val()
-            entry[gender] += delta;
-            entry[age] += delta;
+            entry[gender][age] += delta;
             entry['closed'] = false;
 
             var update = {};
             update[req.session.username] = entry;
 
             clubsRef.update(update);
-            res.json({ success: true});
+        });
 
+        // save a click
+        click = new Click({
+            time: Date.now(),
+            gender: gender,
+            delta: delta,
+            age: age
+        });
+
+        Club.findOneAndUpdate({name: req.session.info.clubname},
+            {$push: {"clicks": click}},
+            {safe: true, upsert: true}, function(err, club) {
+                if (err) throw err;
+                res.json({ success: true});
         })
     }
     else {
@@ -206,26 +270,18 @@ app.post('/api/update', function(req, res) {
 // route for businesses to open the club for the night
 app.post('/api/open', function(req, res) {
     if(req.session.username && req.session.club) {
-        var entry = {
-            male: 0,
-            female: 0,
-            twenty: 0,
-            thirty: 0,
-            forty: 0,
-            fifty: 0,
-            closed: false
-        }
 
-        // persist business info
-        for(key in req.session.info) {
-            entry[key] = req.session.info[key]
-        }
+        // update on firebase, precondition: all values should be 0 for male/female
+        clubsRef.child(req.session.username).once('value').then(function(snapshot) {
+            var entry = snapshot.val()
+            entry['closed'] = false;
 
-        var update = {}
-        update[req.session.username] = entry
+            var update = {};
+            update[req.session.username] = entry;
 
-        clubsRef.update(update);
-        res.json({ success: true});
+            clubsRef.update(update);
+            res.json({ success: true});
+        });        
     }
     else {
         res.json({ success: false, message: "You need to be logged in as a business"});
@@ -235,26 +291,55 @@ app.post('/api/open', function(req, res) {
 // route for businesses to close the club for the night
 app.post('/api/close', function(req, res) {
     if(req.session.username && req.session.club) {
-        var entry = {
-            male: 0,
-            female: 0,
-            twenty: 0,
-            thirty: 0,
-            forty: 0,
-            fifty: 0,
-            closed: true
-        }
 
-        // persist business info
-        for(key in req.session.info) {
-            entry[key] = req.session.info[key]
-        }
+        // update on firebase
+        clubsRef.child(req.session.username).once('value').then(function(snapshot) {
+            var entry = snapshot.val();
 
-        var update = {}
-        update[req.session.username] = entry
+            // make all of the males leave
+            for(i in entry['male']) {
+                // save a click
+                click = new Click({
+                    time: Date.now(),
+                    gender: 'male',
+                    delta: -1*entry['male'][i],
+                    age: i
+                });
 
-        clubsRef.update(update);
-        res.json({ success: true});
+                Club.findOneAndUpdate({name: req.session.info.clubname},
+                    {$push: {"clicks": click}},
+                    {safe: true, upsert: true}, function(err, club) {
+                        if (err) throw err;
+                });
+                entry['male'][i] = 0
+            }
+
+            // make all of the females leave
+            for(i in entry['female']) {
+                // save a click
+                click = new Click({
+                    time: Date.now(),
+                    gender: 'female',
+                    delta: -1*entry['female'][i],
+                    age: i
+                });
+
+                Club.findOneAndUpdate({name: req.session.info.clubname},
+                    {$push: {"clicks": click}},
+                    {safe: true, upsert: true}, function(err, club) {
+                        if (err) throw err;
+                });
+                entry['female'][i] = 0
+            }
+
+            entry['closed'] = true;
+
+            var update = {};
+            update[req.session.username] = entry;
+
+            clubsRef.update(update);
+            res.json({ success: true});
+        });        
     }
     else {
         res.json({ success: false, message: "You need to be logged in as a business"});
@@ -303,6 +388,21 @@ app.post('/api/rate', function(req, res) {
                                               {new: true}, function(err, doc) {
                                                 if (err) throw err;
                                               });
+
+                        rating = new Rating({
+                            time: Date.now(),
+                            username: req.session.username,
+                            comment: req.body.comment,
+                            rating: req.body.rating
+                        });
+
+                        Club.findOneAndUpdate({name: club.clubname},
+                            {$push: {"ratings": rating}},
+                            {safe: true, upsert: true}, function(err, club) {
+                                if (err) throw err;
+                                res.json({ success: true});
+                        })
+
                         res.json({ success: true, message: 'Thanks for the rating!'});
                     }
                 })
@@ -316,7 +416,7 @@ app.post('/api/rate', function(req, res) {
 });
 
 
-// gets the user rating for certain users
+// gets the user rating for certain users, TODO restrict to businesses?
 app.get('/api/rating/:username', function(req, res) {
     User.findOne({name: req.params.username}, function(err, user) {
         if (err) throw err;
