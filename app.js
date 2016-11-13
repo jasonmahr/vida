@@ -251,7 +251,7 @@ app.post('/api/login', function(req, res) {
             res.json({success: true})
         }
     })
-}
+});
 
 /* Business user updates person counts
  * Input:
