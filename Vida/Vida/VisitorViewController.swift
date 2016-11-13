@@ -82,14 +82,11 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
                 print(json["success"])
                 if json["success"] == true{
                     self.tmp = 1
-                    self.semaphore.signal()
-                }
-                else {
-                    self.semaphore.signal()
                 }
             } else {
                 print(error as Any)
             }
+            self.semaphore.signal()
         })
         task.resume()
     }
@@ -104,7 +101,7 @@ class VisitorViewController: UIViewController, UITextFieldDelegate {
             self.present(nextView, animated: true, completion: nil)
         }
         else {
-            label.text = "error"
+            label.text = "Login failed! Try again! :D"
         }
     }
 }
