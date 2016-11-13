@@ -185,13 +185,8 @@ app.post('/api/signup', function(req, res) {
  */
 app.post('/api/login', function(req, res) {
 
-    // find the user, TODO add support for email address lookup
-    if(!req.body.email) {
-        req.body.email = ""
-    }
-    if(!req.body.username) {
-        req.body.username = ""
-    }
+    // find the user
+
     User.findOne({$or: [{name: req.body.username}, {email:req.body.email}]},
         function(err, user) {
         if (err) throw err;
